@@ -39,10 +39,15 @@ const js = () =>
   gulp
     .src(routes.js.src)
     .pipe(
+      // transform에서 bebal compiler를 주어 vanilla JS로 변환 후 gulp-bro로 Common JS으로 변환하여 모든 브라우저가 인식하는 코드로 변환된다.
       gulpBro({
-        transform: [babelify.configure({ presets: ["@babel/preset-env"] })],
+        transform: [
+          babelify.configure({ presets: ["@babel/preset-env"] }),
+          // ["uglifyify", {global:true}] // gulp-uglify를 사용안한다면 추가한다.
+        ],
       })
     )
+    // js파일 크기를 줄이기위한 변환 함수이다.
     .pipe(gulpUglify())
     .pipe(gulp.dest(routes.js.dest));
 
