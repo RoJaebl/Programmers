@@ -10,72 +10,82 @@
  * @type {Heap<{T}>}
  */
 class Heap {
-  constructor({ mode = "ascending" }) {
+  constructor() {
     this.heap = [null];
-    this.mode = mode;
   }
-  /**
-   *
-   * @param {object} mode
-   * @returns
-   */
-  setMode = ({ mode }) => (this.mode = mode);
 
   /**
-   *
+   * 현재 인덱스에 대한 왼쪽 자식 값을 반환한다.
+   * @param {number} parent
+   * @returns {T}
+   */
+  getLeft = (parent) => this.heap[this.leftIndex(parent)];
+  /**
+   * 현재 인덱스에 대한 오른쪽 자식 값을 반환한다.
+   * @param {number} parent
+   * @returns {T}
+   */
+  getRight = (parent) => this.heap[this.rightIndex(parent)];
+  /**
+   * 현재 인덱스에 대한 부모 값을 반환한다.
+   * @param {number} child
+   * @returns {T}
+   */
+  getParent = (child) => this.heap[this.parentIndex(child)];
+  /**
+   * 현재 인덱스에 대한 자신의 값을 반환한다.
+   * @param {number} parent
+   * @returns {T}
+   */
+  getThis = (index) => this.heap[index];
+  /**
+   * Heap의 첫번째 값을 반환한다.
+   * @returns {T}
+   */
+  getMin = () => this.heap[1];
+  /**
+   * 현재 인덱스에 대한 왼쪽 자식 인덱스를 반환한다.
+   * @param {number} parent
+   * @returns {number}
+   */
+  leftIndex = (parent) => parent * 2;
+  /**
+   * 현재 인덱스에 대한 오른쪽 자식 인덱스를 반환한다.
+   * @param {number} parent
+   * @returns {number}
+   */
+  rightIndex = (parent) => parent * 2 + 1;
+  /**
+   * 현재 인덱스에 대한 부모 인덱스를 반환한다.
+   * @param {number} child
+   * @returns {number}
+   */
+  parentIndex = (child) => (child / 2) >> 0;
+  /**
+   * Heap에 들어간 데이터 길이를 반환한다.
    * @returns {number}
    */
   size = () => this.heap.length - 1;
 
   /**
-   *
-   * @param {number} parent
-   * @returns {T}
+   * 입력한 모드에 따라 현재 인덱스와 스왑
+   * @param {number} index
+   * @param {string} mode
    */
-  getLeft = (parent) => this.heap[parent * 2];
+  swap = (index, mode = "p") => {
+    /**
+     * 입력된 인덱스와 스왑
+     * @param {number} one
+     * @param {number} two
+     */
+    const swap = (one, two) => {
+      [this.heap[one], this.heap[two]] = [this.heap[two], this.heap[one]];
+    };
 
-  /**
-   *
-   * @param {number} parent
-   * @returns {T}
-   */
-  getRight = (parent) => this.heap[parent * 2 + 1];
-
-  /**
-   *
-   * @param {number} child
-   * @returns {T}
-   */
-  getParent = (child) => this.heap[(child / 2) >> 0];
-
-  /**
-   *
-   * @returns {T}
-   */
-  getMin = () => (this.heap[1] != null ? this.heap[1] : null);
-
-  /**
-   *
-   * @param {number} parent
-   * @param {number} child
-   */
-  swap = (one, two) => {
-    [this.heap[one], this.heap[two]] = [this.heap[two], this.heap[one]];
+    if (mode == "l") swap(index, this.leftIndex(index));
+    else if (mode == "r") swap(index, this.rightIndex(index));
+    else swap(index, this.parentIndex(index));
   };
-
-  /**
-   *
-   * @param {number} parent
-   * @returns {number}
-   */
-  leftIndex = (parent) => parent * 2;
-
-  /**
-   *
-   * @param {number} parent
-   * @returns {number}
-   */
-  rightIndex = (parent) => parent * 2 + 1;
 
   /**
    * Heap 삽입이다.
@@ -85,9 +95,8 @@ class Heap {
     this.heap.push(data);
 
     for (let child = this.size(); child > 1; ) {
-      const parent = (child / 2) >> 0;
-      if (this.heap[child] > this.heap[parent]) this.swap(parent, child);
-      child = parent;
+      if (this.getThis(child) > this.getParent(child)) this.swap(child);
+      child = this.parentIndex(child);
     }
   };
 
@@ -103,21 +112,27 @@ class Heap {
     this.heap = [zero, last, ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
-      if (this.getLeft(parent) > this.getRight(parent)) {
-        this.swap(parent, this.leftIndex(parent));
+      if (
+        this.getLeft(parent) < this.getThis(parent) &&
+        this.getThis(parent) > this.getRight(parent)
+      )
+        break;
+      else if (this.getLeft(parent) > this.getRight(parent)) {
+        this.swap(parent, "l");
         parent = this.leftIndex(parent);
-      } else if (this.getLeft(parent) < this.getRight(parent)) {
-        this.swap(parent, this.rightIndex(parent));
+      } else {
+        this.swap(parent, "r");
         parent = this.rightIndex(parent);
-      } else break;
+      }
     }
-
     return first;
   };
 }
-
-const heap = new Heap({});
-//[-1, -4, -3, -5, -2, -6].forEach((value) => heap.insert(value));
-[1, 3, 5, 7, 9, 2, 4, 6, 8, 0].forEach((value) => heap.insert(value));
-console.log(heap.heap);
-console.log(heap.delete(), heap.heap);
+/*
+const heap = new Heap();
+console.log(heap.heap, `len : ${heap.size()} `);
+//[1, 4, 3, 5, 2, 6, 12, 11, 8, 7, 9, 10].forEach((value) => heap.insert(value));
+//[6, 4, 5, 1, 2].forEach((value) => heap.insert(value));
+console.log(heap.heap, `len : ${heap.size()} `);
+console.log(`delete : ${heap.delete()}`, heap.heap, `len : ${heap.size()} `);
+*/
