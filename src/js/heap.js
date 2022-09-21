@@ -88,7 +88,7 @@ export class Heap {
   };
 }
 
-export class ascendingHeap extends Heap {
+export class ascending extends Heap {
   constructor() {
     super();
   }
@@ -134,7 +134,7 @@ export class ascendingHeap extends Heap {
     return first;
   };
 }
-export class descendingHeap extends Heap {
+export class descending extends Heap {
   constructor() {
     super();
   }
@@ -170,6 +170,98 @@ export class descendingHeap extends Heap {
       )
         break;
       else if (this.getLeft(parent) > this.getRight(parent)) {
+        this.swap(parent, "r");
+        parent = this.rightIndex(parent);
+      } else {
+        this.swap(parent, "l");
+        parent = this.leftIndex(parent);
+      }
+    }
+    return first;
+  };
+}
+
+export class ascendingObj extends Heap {
+  constructor() {
+    super();
+  }
+  /**
+   * Heap 삽입이다.
+   * @param {T} data
+   */
+  insert = (data) => {
+    this.heap.push(data);
+
+    for (let child = this.size(); child > 1; ) {
+      const { data: thisData } = this.getThis(child);
+      const { data: parentData } = this.getParent(child);
+      if (thisData > parentData) this.swap(child);
+      child = this.parentIndex(child);
+    }
+  };
+  /**
+   *
+   * @return {T}
+   */
+  delete = () => {
+    if (this.size() == 0) return 0;
+
+    const [zero, first, ...heap] = this.heap;
+    const last = heap.pop();
+    this.heap = [zero, last, ...heap];
+
+    for (let parent = 1; parent * 2 < this.size(); ) {
+      const { data: thisData } = this.getThis(parent);
+      const { data: leftData } = this.getLeft(parent);
+      const { data: rightData } = this.getRight(parent);
+      if (leftData < thisData && thisData > rightData) break;
+      else if (leftData > rightData) {
+        this.swap(parent, "l");
+        parent = this.leftIndex(parent);
+      } else {
+        this.swap(parent, "r");
+        parent = this.rightIndex(parent);
+      }
+    }
+    return first;
+  };
+}
+
+export class descendingObj extends Heap {
+  constructor() {
+    super();
+  }
+  /**
+   * Heap 삽입이다.
+   * @param {T} data
+   */
+  insert = (data) => {
+    this.heap.push(data);
+
+    for (let child = this.size(); child > 1; ) {
+      const { data: thisData } = this.getThis(child);
+      const { data: parentData } = this.getParent(child);
+      if (thisData < parentData) this.swap(child);
+      child = this.parentIndex(child);
+    }
+  };
+  /**
+   *
+   * @return {T}
+   */
+  delete = () => {
+    if (this.size() == 0) return 0;
+
+    const [zero, first, ...heap] = this.heap;
+    const last = heap.pop();
+    this.heap = [zero, last, ...heap];
+
+    for (let parent = 1; parent * 2 < this.size(); ) {
+      const { data: thisData } = this.getThis(parent);
+      const { data: leftData } = this.getLeft(parent);
+      const { data: rightData } = this.getRight(parent);
+      if (leftData > thisData && thisData < rightData) break;
+      else if (leftData > rightData) {
         this.swap(parent, "r");
         parent = this.rightIndex(parent);
       } else {
