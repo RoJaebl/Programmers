@@ -1,19 +1,13 @@
 import Heap from "./heap.js";
+
 /**
- * n       : 6
- * paths   : [[1,2,2],[1,3,5],[1,4,1],[2,3,3],[2,4,2],[3,4,3],[3,5,1],[3,6,5],[4,5,1],[5,6,2]]
- * gates   : 1
- * summits : 6
- */
-/**
- *
  * @param {Number} n
  * @param {Number[][]} paths
  * @param {Number[]} gate
  * @param {Number[]} summits
  * @returns
  */
-function solution(n, paths, gate, summits) {
+export function dijkstraBase(n, paths, gate) {
   /** @description 저달받은 paths의 정보를 쉽게 접근하기위해 데이터를 Map으로 가공한다. */
   const nodeNum = n + 1;
   const nodeMap = new Array(nodeNum).fill(null).map((_) => []);
@@ -138,14 +132,15 @@ function solution(n, paths, gate, summits) {
       */
     }
   };
-  console.table(table);
   dijkstra(gate);
-  return 0;
+  return table;
 }
 
-const heap = new Heap();
-console.log(heap.heap, `len : ${heap.size()} `);
-[1, 4, 3, 5, 2, 6, 12, 11, 8, 7, 9, 10].forEach((value) => heap.insert(value));
-//[6, 4, 5, 1, 2].forEach((value) => heap.insert(value));
-console.log(heap.heap, `len : ${heap.size()} `);
-console.log(`delete : ${heap.delete()}`, heap.heap, `len : ${heap.size()} `);
+/**
+ * @param {Number} n
+ * @param {Number[][]} paths
+ * @param {Number[]} gate
+ * @param {Number[]} summits
+ * @returns
+ */
+export function dijkstraHeap(n, paths, gate) {}

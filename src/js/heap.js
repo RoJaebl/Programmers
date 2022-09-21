@@ -66,7 +66,6 @@ export default class Heap {
    * @returns {number}
    */
   size = () => this.heap.length - 1;
-
   /**
    * 입력한 모드에 따라 현재 인덱스와 스왑
    * @param {number} index
@@ -86,7 +85,6 @@ export default class Heap {
     else if (mode == "r") swap(index, this.rightIndex(index));
     else swap(index, this.parentIndex(index));
   };
-
   /**
    * Heap 삽입이다.
    * @param {T} data
@@ -99,7 +97,6 @@ export default class Heap {
       child = this.parentIndex(child);
     }
   };
-
   /**
    *
    * @return {T}
@@ -128,3 +125,12 @@ export default class Heap {
     return first;
   };
 }
+
+/* @example
+const heap = new Heap();
+console.log(heap.heap, `len : ${heap.size()} `);
+[1, 4, 3, 5, 2, 6, 12, 11, 8, 7, 9, 10].forEach((value) => heap.insert(value));
+//[6, 4, 5, 1, 2].forEach((value) => heap.insert(value));
+console.log(heap.heap, `len : ${heap.size()} `);
+console.log(`delete : ${heap.delete()}`, heap.heap, `len : ${heap.size()} `);
+*/
