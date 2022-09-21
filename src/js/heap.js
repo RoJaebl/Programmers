@@ -9,7 +9,7 @@
  *   - p = c / 2
  * @type {Heap<{T}>}
  */
-export default class Heap {
+export class Heap {
   constructor() {
     this.heap = [null];
   }
@@ -85,6 +85,13 @@ export default class Heap {
     else if (mode == "r") swap(index, this.rightIndex(index));
     else swap(index, this.parentIndex(index));
   };
+}
+
+export class ascendingHeap extends Heap {
+  constructor() {
+    super();
+  }
+
   /**
    * Heap 삽입이다.
    * @param {T} data
@@ -120,6 +127,52 @@ export default class Heap {
       } else {
         this.swap(parent, "r");
         parent = this.rightIndex(parent);
+      }
+    }
+    return first;
+  };
+}
+export class descendingHeap extends Heap {
+  constructor() {
+    super();
+  }
+
+  /**
+   * Heap 삽입이다.
+   * @param {T} data
+   */
+  insert = (data) => {
+    this.heap.push(data);
+
+    for (let child = this.size(); child > 1; ) {
+      if (this.getThis(child) < this.getParent(child)) this.swap(child);
+      child = this.parentIndex(child);
+    }
+  };
+
+  /**
+   *
+   * @return {T}
+   */
+  delete = () => {
+    if (this.size() == 0) return 0;
+
+    const [zero, first, ...heap] = this.heap;
+    const last = heap.pop();
+    this.heap = [zero, last, ...heap];
+
+    for (let parent = 1; parent * 2 < this.size(); ) {
+      if (
+        this.getLeft(parent) > this.getThis(parent) &&
+        this.getThis(parent) < this.getRight(parent)
+      )
+        break;
+      else if (this.getLeft(parent) > this.getRight(parent)) {
+        this.swap(parent, "r");
+        parent = this.rightIndex(parent);
+      } else {
+        this.swap(parent, "l");
+        parent = this.leftIndex(parent);
       }
     }
     return first;

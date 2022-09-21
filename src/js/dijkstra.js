@@ -1,4 +1,4 @@
-import Heap from "./heap.js";
+import * as Heap from "./heap.js";
 
 /**
  * @param {Number} n
