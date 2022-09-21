@@ -1,5 +1,30 @@
 import * as Heap from "./heap.js";
 
+class NodeMap {
+  /**
+   *
+   * @param {numbaer} node
+   * @param {number[][]} paths
+   */
+  constructor(node, paths) {
+    this.node = node;
+    this.length = node + 1;
+    this.map = new Array(this.length).fill(null).map(() => []);
+    this.createMap(paths);
+  }
+
+  createMap = (paths) => {
+    for (let i = 0; i < paths.length; i++) {
+      const [nodeOne, nodeTwo, weight] = paths[i];
+      this.map[nodeOne].push({ to: nodeTwo, resource: weight });
+      this.map[nodeTwo].push({ to: nodeOne, resource: weight });
+    }
+  };
+
+  getMap = (index) => this.map[index];
+  showMap = () => console.table(this.map);
+}
+
 /**
  * @param {Number} n
  * @param {Number[][]} paths
@@ -137,10 +162,92 @@ export function dijkstraBase(n, paths, gate) {
 }
 
 /**
- * @param {Number} n
- * @param {Number[][]} paths
- * @param {Number[]} gate
- * @param {Number[]} summits
+ *
+ * @param {number} n
+ * @param {number[][]} paths
+ * @param {number[]} gate
  * @returns
  */
-export function dijkstraHeap(n, paths, gate) {}
+export function dijkstraHeap(n, paths, gate) {
+  const nodeMap = new NodeMap(n, paths);
+  nodeMap.showMap();
+
+  const heapTable = new Heap.descendingHeap();
+  /**
+   *
+   * @param {object} data
+   */
+  const initialHeapTable = ({ ...data }) => {
+    heapTable.insert(data);
+  };
+  initialHeapTable({ to: 1, resource: 2 });
+  initialHeapTable({ to: 2, resource: 0 });
+  initialHeapTable({ to: 3, resource: 4 });
+  initialHeapTable({ to: 4, resource: 4 });
+  initialHeapTable({ to: 5, resource: 1 });
+  console.log(heapTable.heap);
+
+  const table1 = new Array(nodeMap.length).fill({
+    visit: false,
+    resource: Infinity,
+  });
+  console.table(table1);
+
+  const table = [];
+  const VISIT = 0;
+  const WEIGHT = 1;
+  for (let i = 0; i < nodeMap.length; i++) {
+    table.push([false, Infinity]);
+  }
+
+  /**
+   *
+   * @param {number[][]} startNode
+   */
+  const initialTable = (startNode) => {
+    table[startNode] = [true, 0];
+    for (const [adjacency, weight] of nodeMap.getMap(startNode)) {
+      table[adjacency][WEIGHT] = weight;
+    }
+  };
+
+  /**
+   *
+   * @returns {number} 자원이 가장 낮은 노드번호를 반환한다.
+   */
+  const getGrid = (table) => {
+    let [node, minWeight] = [0, Infinity];
+    for (let i = 1; i < nodeMap.length; i++) {
+      const [visit, weight] = table[i];
+      if (!visit && weight < minWeight) {
+        minWeight = weight;
+        node = i;
+      }
+    }
+    return node;
+  };
+
+  /**
+   *
+   * @param {number} startNode - 다익스트라 알고리즘을 시작할 노드번호이다.
+   */
+  const dijkstra = (startNode) => {
+    initialTable(startNode);
+    for (let i = 0; i < nodeMap.length - 2; i++) {
+      const current = getGrid(table);
+      table[current][VISIT] = true;
+      const currentNode = nodeMap.getMap(current);
+
+      for (let j = 0; j < currentNode.length; j++) {
+        const [node] = currentNode[j];
+        if (
+          !table[node][VISIT] &&
+          table[current][WEIGHT] + currentNode[j][WEIGHT] < table[node][WEIGHT]
+        )
+          table[node][WEIGHT] = table[current][WEIGHT] + currentNode[j][WEIGHT];
+      }
+    }
+  };
+  dijkstra(gate);
+  return table;
+}
