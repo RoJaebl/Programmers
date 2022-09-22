@@ -223,8 +223,9 @@ export class ascendingObj extends Heap {
   };
 }
 export class descendingObj extends Heap {
-  constructor() {
+  constructor(compare = "heapValue") {
     super();
+    this.compare = compare;
   }
   /**
    *
