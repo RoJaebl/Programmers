@@ -11,7 +11,7 @@
  */
 class Heap {
   constructor() {
-    this.heap = [null];
+    this.heap = [];
   }
 
   /**
@@ -85,6 +85,7 @@ class Heap {
     else if (mode == "r") swap(index, this.rightIndex(index));
     else swap(index, this.parentIndex(index));
   };
+  showHeap = () => console.table(this.heap);
 }
 export class ascending extends Heap {
   constructor() {
@@ -108,11 +109,11 @@ export class ascending extends Heap {
    * @return {T}
    */
   delete = () => {
-    if (this.size() == 0) return 0;
+    if (this.size() == 1) return this.heap.pop();
 
     const [zero, first, ...heap] = this.heap;
-    const last = heap.pop();
-    this.heap = [zero, last, ...heap];
+    let last = heap.pop();
+    if (this.size() > 1) this.heap = [zero, last, ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
       if (
@@ -154,11 +155,11 @@ export class descending extends Heap {
    * @return {T}
    */
   delete = () => {
-    if (this.size() == 0) return 0;
+    if (this.size() == 1) return this.heap.pop();
 
     const [zero, first, ...heap] = this.heap;
-    const last = heap.pop();
-    this.heap = [zero, last, ...heap];
+    let last = heap.pop();
+    if (this.size() > 1) this.heap = [zero, last, ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
       if (
@@ -181,6 +182,7 @@ export class ascendingObj extends Heap {
   constructor(compare = "heapValue") {
     super();
     this.compare = compare;
+    this.heap = [{}];
   }
   /**
    *
@@ -201,10 +203,11 @@ export class ascendingObj extends Heap {
    * @return {T}
    */
   delete = () => {
-    if (this.size() == 0) return 0;
+    if (this.size() < 2) return {};
 
     const [zero, first, ...heap] = this.heap;
-    this.heap = [zero, heap.pop(), ...heap];
+    let last = heap.pop();
+    if (this.size() > 1) this.heap = [zero, last, ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
       const current = this.getThis(parent)[this.compare];
@@ -226,6 +229,7 @@ export class descendingObj extends Heap {
   constructor(compare = "heapValue") {
     super();
     this.compare = compare;
+    this.heap = [{}];
   }
   /**
    *
@@ -246,10 +250,11 @@ export class descendingObj extends Heap {
    * @return {T}
    */
   delete = () => {
-    if (this.size() == 0) return 0;
+    if (this.size() == 1) return this.heap.pop();
 
     const [zero, first, ...heap] = this.heap;
-    this.heap = [zero, heap.pop(), ...heap];
+    let last = heap.pop();
+    if (this.size() > 1) this.heap = [zero, last, ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
       const current = this.getThis(parent)[this.compare];
@@ -306,6 +311,7 @@ class HeapArray extends Heap {
 export class ascendingArray extends HeapArray {
   constructor(compare) {
     super(compare);
+    this.heap = [[]];
   }
 
   /**
@@ -331,11 +337,11 @@ export class ascendingArray extends HeapArray {
    * @return {T}
    */
   delete = () => {
-    if (this.size() == 0) return 0;
+    if (this.size() == 1) return this.heap.pop();
 
     const [zero, first, ...heap] = this.heap;
-    const last = heap.pop();
-    this.heap = [zero, last, ...heap];
+    let last = heap.pop();
+    if (this.size() > 1) this.heap = [zero, last, ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
       if (
@@ -357,6 +363,7 @@ export class ascendingArray extends HeapArray {
 export class descendingArray extends HeapArray {
   constructor(compare) {
     super(compare);
+    this.heap = [[]];
   }
 
   /**
@@ -377,11 +384,11 @@ export class descendingArray extends HeapArray {
    * @return {T}
    */
   delete = () => {
-    if (this.size() == 0) return 0;
+    if (this.size() == 1) return this.heap.pop();
 
     const [zero, first, ...heap] = this.heap;
-    const last = heap.pop();
-    this.heap = [zero, last, ...heap];
+    let last = heap.pop();
+    if (this.size() > 1) this.heap = [zero, last, ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
       if (

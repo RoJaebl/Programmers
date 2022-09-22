@@ -1,26 +1,80 @@
 import * as Heap from "./heap.js";
 
+class NodeTable {
+  constructor(node, property) {
+    this.node = node;
+    this.table = [{}];
+    this.property = property;
+    this.initializeNodeTable();
+  }
+  initializeNodeTable = () => {
+    for (let i = 1; i < this.node + 1; i++) {
+      this.table.push(this.createObject(this.property, [false, Infinity]));
+    }
+  };
+  /**
+   *
+   * @param {object} property
+   * @param {any[]} data
+   * @returns {object}
+   */
+  createObject = ({ ...property }, data) => {
+    const obj = {};
+    Object.keys(property).map((value, index) => (obj[value] = data[index]));
+    return obj;
+  };
+  pushItem = (item) => this.table.push(item);
+  popItem = (item) => this.table.pop(item);
+  shiftItem = (item) => this.table.shift(item);
+  getItem = (node) => this.table[node];
+  getValue = (node, property) => this.table[node][property];
+  setValue = (node, property, value) => (this.table[node][property] = value);
+  showTable = () => console.table(this.table);
+}
+
 class NodeMap {
   /**
    *
    * @param {numbaer} node
    * @param {number[][]} paths
    */
-  constructor(node, paths) {
+  constructor(node, paths, property) {
     this.node = node;
     this.length = node + 1;
+    this.property = property;
+    this.propertyLength = Object.keys(this.property).length;
     this.map = new Array(this.length).fill(null).map(() => []);
-    this.createMap(paths);
+    this.initializeMap(paths);
   }
-
-  createMap = (paths) => {
+  initializeMap = (paths) => {
     for (let i = 0; i < paths.length; i++) {
       const [nodeOne, nodeTwo, weight] = paths[i];
-      this.map[nodeOne].push({ to: nodeTwo, resource: weight });
-      this.map[nodeTwo].push({ to: nodeOne, resource: weight });
+      this.map[nodeOne].push(
+        this.createObject(this.property, [nodeTwo, weight])
+      );
+      this.map[nodeTwo].push(
+        this.createObject(this.property, [nodeOne, weight])
+      );
     }
   };
+  /**
+   *
+   * @param {object} property
+   * @param {any[]} data
+   * @returns {object}
+   */
+  createObject = ({ ...property }, data) => {
+    const obj = {};
+    Object.keys(property).map((value, index) => (obj[value] = data[index]));
+    return obj;
+  };
 
+  createProperty = (node, resource) => {
+    const nodeInfo = {};
+    nodeInfo[this.property1] = node;
+    nodeInfo[this.property2] = resource;
+    return nodeInfo;
+  };
   getMap = (index) => this.map[index];
   showMap = () => console.table(this.map);
 }
@@ -169,68 +223,39 @@ export function dijkstraBase(n, paths, gate) {
  * @returns
  */
 export function dijkstraHeap(n, paths, gate) {
-  const nodeMap = new NodeMap(n, paths);
+  const nodeObj = {
+    to: undefined,
+    resource: undefined,
+  };
+  const tableObj = {
+    visit: undefined,
+    resource: undefined,
+  };
+  const nodeMap = new NodeMap(n, paths, nodeObj);
+  const nodeTable = new NodeTable(n, tableObj);
+  const heapTable = new Heap.descendingObj("resuorce");
+
   nodeMap.showMap();
+  nodeTable.showTable();
 
-  const heapTable = new Heap.descendingHeap();
-  /**
-   *
-   * @param {object} data
-   */
-  const initialHeapTable = ({ ...data }) => {
-    heapTable.insert(data);
-  };
-  initialHeapTable({ to: 1, resource: 2 });
-  initialHeapTable({ to: 2, resource: 0 });
-  initialHeapTable({ to: 3, resource: 4 });
-  initialHeapTable({ to: 4, resource: 4 });
-  initialHeapTable({ to: 5, resource: 1 });
-  console.log(heapTable.heap);
-
-  const table1 = new Array(nodeMap.length).fill({
-    visit: false,
-    resource: Infinity,
-  });
-  console.table(table1);
-
-  const table = [];
-  const VISIT = 0;
-  const WEIGHT = 1;
-  for (let i = 0; i < nodeMap.length; i++) {
-    table.push([false, Infinity]);
-  }
-
-  /**
-   *
-   * @param {number[][]} startNode
-   */
-  const initialTable = (startNode) => {
-    table[startNode] = [true, 0];
-    for (const [adjacency, weight] of nodeMap.getMap(startNode)) {
-      table[adjacency][WEIGHT] = weight;
+  const dijkstra = (startNode) => {
+    heapTable.insert({ to: startNode, resource: 0 });
+    heapTable.showHeap();
+    // while (heapTable.size() > 0) {
+    //   const { to: current, resource } = heapTable.delete();
+    //   nodeMap.getMap(current).forEach((value) => heapTable.insert(value));
+    //   console.log(current, resource);
+    //   heapTable.showHeap();
+    // }
+    for (let i = 0; i < 6; i++) {
+      const { to: current, resource } = heapTable.delete();
+      nodeMap.getMap(current).forEach((value) => heapTable.insert(value));
+      console.log(current, resource);
+      heapTable.showHeap();
     }
   };
 
-  /**
-   *
-   * @returns {number} 자원이 가장 낮은 노드번호를 반환한다.
-   */
-  const getGrid = (table) => {
-    let [node, minWeight] = [0, Infinity];
-    for (let i = 1; i < nodeMap.length; i++) {
-      const [visit, weight] = table[i];
-      if (!visit && weight < minWeight) {
-        minWeight = weight;
-        node = i;
-      }
-    }
-    return node;
-  };
-
-  /**
-   *
-   * @param {number} startNode - 다익스트라 알고리즘을 시작할 노드번호이다.
-   */
+  /*
   const dijkstra = (startNode) => {
     initialTable(startNode);
     for (let i = 0; i < nodeMap.length - 2; i++) {
@@ -248,6 +273,7 @@ export function dijkstraHeap(n, paths, gate) {
       }
     }
   };
+  */
   dijkstra(gate);
-  return table;
+  return 0;
 }
