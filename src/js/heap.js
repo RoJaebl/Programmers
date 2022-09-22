@@ -9,7 +9,7 @@
  *   - p = c / 2
  * @type {Heap<{T}>}
  */
-export class Heap {
+class Heap {
   constructor() {
     this.heap = [null];
   }
@@ -86,8 +86,7 @@ export class Heap {
     else swap(index, this.parentIndex(index));
   };
 }
-
-export class ascendingHeap extends Heap {
+export class ascending extends Heap {
   constructor() {
     super();
   }
@@ -132,7 +131,7 @@ export class ascendingHeap extends Heap {
     return first;
   };
 }
-export class descendingHeap extends Heap {
+export class descending extends Heap {
   constructor() {
     super();
   }
@@ -178,12 +177,224 @@ export class descendingHeap extends Heap {
     return first;
   };
 }
+export class ascendingObj extends Heap {
+  constructor() {
+    super();
+  }
+  /**
+   *
+   * @param {object} object
+   */
+  insert = ({ heapValue, ...data }) => {
+    this.heap.push({ heapValue, ...data });
 
-/* @example
-const heap = new Heap();
-console.log(heap.heap, `len : ${heap.size()} `);
-[1, 4, 3, 5, 2, 6, 12, 11, 8, 7, 9, 10].forEach((value) => heap.insert(value));
-//[6, 4, 5, 1, 2].forEach((value) => heap.insert(value));
-console.log(heap.heap, `len : ${heap.size()} `);
-console.log(`delete : ${heap.delete()}`, heap.heap, `len : ${heap.size()} `);
-*/
+    for (let child = this.size(); child > 1; ) {
+      const current = this.getThis(child).heapValue;
+      const parent = this.getParent(child).heapValue;
+      if (current > parent) this.swap(child);
+      child = this.parentIndex(child);
+    }
+  };
+  /**
+   *
+   * @return {T}
+   */
+  delete = () => {
+    if (this.size() == 0) return 0;
+
+    const [zero, first, ...heap] = this.heap;
+    this.heap = [zero, heap.pop(), ...heap];
+
+    for (let parent = 1; parent * 2 < this.size(); ) {
+      const current = this.getThis(parent).heapValue;
+      const left = this.getLeft(parent).heapValue;
+      const right = this.getRight(parent).heapValue;
+      if (left < current && current > right) break;
+      else if (left > right) {
+        this.swap(parent, "l");
+        parent = this.leftIndex(parent);
+      } else {
+        this.swap(parent, "r");
+        parent = this.rightIndex(parent);
+      }
+    }
+    return first;
+  };
+}
+export class descendingObj extends Heap {
+  constructor() {
+    super();
+  }
+  /**
+   *
+   * @param {object} object
+   */
+  insert = ({ heapValue, ...data }) => {
+    this.heap.push({ heapValue, ...data });
+
+    for (let child = this.size(); child > 1; ) {
+      const current = this.getThis(child).heapValue;
+      const parent = this.getParent(child).heapValue;
+      if (current < parent) this.swap(child);
+      child = this.parentIndex(child);
+    }
+  };
+  /**
+   *
+   * @return {T}
+   */
+  delete = () => {
+    if (this.size() == 0) return 0;
+
+    const [zero, first, ...heap] = this.heap;
+    this.heap = [zero, heap.pop(), ...heap];
+
+    for (let parent = 1; parent * 2 < this.size(); ) {
+      const current = this.getThis(parent).heapValue;
+      const left = this.getLeft(parent).heapValue;
+      const right = this.getRight(parent).heapValue;
+      if (left > current && current < right) break;
+      else if (left > right) {
+        this.swap(parent, "r");
+        parent = this.rightIndex(parent);
+      } else {
+        this.swap(parent, "l");
+        parent = this.leftIndex(parent);
+      }
+    }
+    return first;
+  };
+}
+
+class HeapArray extends Heap {
+  constructor(compare = 0) {
+    super();
+    this.compare = compare;
+  }
+  /**
+   * 현재 인덱스에 대한 왼쪽 자식 값을 반환한다.
+   * @param {number} parent
+   * @returns {T}
+   */
+  getLeft = (parent) => this.heap[this.leftIndex(parent)][this.compare];
+  /**
+   * 현재 인덱스에 대한 오른쪽 자식 값을 반환한다.
+   * @param {number} parent
+   * @returns {T}
+   */
+  getRight = (parent) => this.heap[this.rightIndex(parent)][this.compare];
+  /**
+   * 현재 인덱스에 대한 부모 값을 반환한다.
+   * @param {number} child
+   * @returns {T}
+   */
+  getParent = (child) => this.heap[this.parentIndex(child)][this.compare];
+  /**
+   * 현재 인덱스에 대한 자신의 값을 반환한다.
+   * @param {number} parent
+   * @returns {T}
+   */
+  getThis = (index) => this.heap[index][this.compare];
+  /**
+   * Heap의 첫번째 값을 반환한다.
+   * @returns {T}
+   */
+  getMin = () => this.heap[1][this.compare];
+}
+export class ascendingArray extends HeapArray {
+  constructor(compare) {
+    super(compare);
+  }
+
+  /**
+   * @TODO 함수를 동작시키면 현재 설정된 campare 기준으로
+   * Heap 재배열
+   */
+
+  /**
+   * Heap 삽입이다.
+   * @param {T} data
+   */
+  insert = (data) => {
+    this.heap.push(data);
+
+    for (let child = this.size(); child > 1; ) {
+      if (this.getThis(child) > this.getParent(child)) this.swap(child);
+      child = this.parentIndex(child);
+    }
+  };
+
+  /**
+   *
+   * @return {T}
+   */
+  delete = () => {
+    if (this.size() == 0) return 0;
+
+    const [zero, first, ...heap] = this.heap;
+    const last = heap.pop();
+    this.heap = [zero, last, ...heap];
+
+    for (let parent = 1; parent * 2 < this.size(); ) {
+      if (
+        this.getLeft(parent) < this.getThis(parent) &&
+        this.getThis(parent) > this.getRight(parent)
+      )
+        break;
+      else if (this.getLeft(parent) > this.getRight(parent)) {
+        this.swap(parent, "l");
+        parent = this.leftIndex(parent);
+      } else {
+        this.swap(parent, "r");
+        parent = this.rightIndex(parent);
+      }
+    }
+    return first;
+  };
+}
+export class descendingArray extends HeapArray {
+  constructor(compare) {
+    super(compare);
+  }
+
+  /**
+   * Heap 삽입이다.
+   * @param {T} data
+   */
+  insert = (data) => {
+    this.heap.push(data);
+
+    for (let child = this.size(); child > 1; ) {
+      if (this.getThis(child) < this.getParent(child)) this.swap(child);
+      child = this.parentIndex(child);
+    }
+  };
+
+  /**
+   *
+   * @return {T}
+   */
+  delete = () => {
+    if (this.size() == 0) return 0;
+
+    const [zero, first, ...heap] = this.heap;
+    const last = heap.pop();
+    this.heap = [zero, last, ...heap];
+
+    for (let parent = 1; parent * 2 < this.size(); ) {
+      if (
+        this.getLeft(parent) > this.getThis(parent) &&
+        this.getThis(parent) < this.getRight(parent)
+      )
+        break;
+      else if (this.getLeft(parent) > this.getRight(parent)) {
+        this.swap(parent, "r");
+        parent = this.rightIndex(parent);
+      } else {
+        this.swap(parent, "l");
+        parent = this.leftIndex(parent);
+      }
+    }
+    return first;
+  };
+}
