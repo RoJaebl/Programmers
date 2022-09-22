@@ -1,31 +1,16 @@
 import * as Heap from "./heap";
 
 // obj heap
-const heapObj = new Heap.ascendingObj();
+const compare = "to";
+const heapObj = new Heap.ascendingObj(compare);
 console.log(heapObj.heap, `len : ${heapObj.size()} `);
-[
-  { heapValue: 1, obj: "hi" },
-  { heapValue: 4, obj: "hi" },
-  { heapValue: 3, obj: "hi" },
-  { heapValue: 5, obj: "hi" },
-  { heapValue: 2, obj: "hi" },
-  { heapValue: 6, obj: "hi" },
-  { heapValue: 12, obj: "hi" },
-  { heapValue: 11, obj: "hi" },
-  { heapValue: 8, obj: "hi" },
-  { heapValue: 7, obj: "hi" },
-  { heapValue: 9, obj: "hi" },
-  { heapValue: 10, obj: "hi" },
-].forEach((value) => heapObj.insert(value));
-/*
-[
-  { heapValue: 6, obj: "hi" },
-  { heapValue: 4, obj: "hi" },
-  { heapValue: 5, obj: "hi" },
-  { heapValue: 1, obj: "hi" },
-  { heapValue: 2, obj: "hi" },
-].forEach((value) => heap.insert(value));
-*/
+
+for (let i = 0; i < 12; i++) {
+  const obj = {};
+  obj[compare] = i + 1;
+  obj["obj"] = (Math.random(100) * 100) >> 0;
+  heapObj.insert(obj);
+}
 console.log(heapObj.heap, `len : ${heapObj.size()} `);
 console.log(
   `delete : `,
