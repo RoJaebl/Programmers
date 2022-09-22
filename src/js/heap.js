@@ -178,19 +178,20 @@ export class descending extends Heap {
   };
 }
 export class ascendingObj extends Heap {
-  constructor() {
+  constructor(compare = "heapValue") {
     super();
+    this.compare = compare;
   }
   /**
    *
    * @param {object} object
    */
-  insert = ({ heapValue, ...data }) => {
-    this.heap.push({ heapValue, ...data });
+  insert = (data) => {
+    this.heap.push(data);
 
     for (let child = this.size(); child > 1; ) {
-      const current = this.getThis(child).heapValue;
-      const parent = this.getParent(child).heapValue;
+      const current = this.getThis(child)[this.compare];
+      const parent = this.getParent(child)[this.compare];
       if (current > parent) this.swap(child);
       child = this.parentIndex(child);
     }
@@ -206,9 +207,9 @@ export class ascendingObj extends Heap {
     this.heap = [zero, heap.pop(), ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
-      const current = this.getThis(parent).heapValue;
-      const left = this.getLeft(parent).heapValue;
-      const right = this.getRight(parent).heapValue;
+      const current = this.getThis(parent)[this.compare];
+      const left = this.getLeft(parent)[this.compare];
+      const right = this.getRight(parent)[this.compare];
       if (left < current && current > right) break;
       else if (left > right) {
         this.swap(parent, "l");
@@ -229,12 +230,12 @@ export class descendingObj extends Heap {
    *
    * @param {object} object
    */
-  insert = ({ heapValue, ...data }) => {
-    this.heap.push({ heapValue, ...data });
+  insert = (data) => {
+    this.heap.push(data);
 
     for (let child = this.size(); child > 1; ) {
-      const current = this.getThis(child).heapValue;
-      const parent = this.getParent(child).heapValue;
+      const current = this.getThis(child)[this.compare];
+      const parent = this.getParent(child)[this.compare];
       if (current < parent) this.swap(child);
       child = this.parentIndex(child);
     }
@@ -250,9 +251,9 @@ export class descendingObj extends Heap {
     this.heap = [zero, heap.pop(), ...heap];
 
     for (let parent = 1; parent * 2 < this.size(); ) {
-      const current = this.getThis(parent).heapValue;
-      const left = this.getLeft(parent).heapValue;
-      const right = this.getRight(parent).heapValue;
+      const current = this.getThis(parent)[this.compare];
+      const left = this.getLeft(parent)[this.compare];
+      const right = this.getRight(parent)[this.compare];
       if (left > current && current < right) break;
       else if (left > right) {
         this.swap(parent, "r");
