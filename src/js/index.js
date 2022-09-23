@@ -118,7 +118,101 @@
  * ### 제한시간 안내
  * 정확성 테스트 : 10초
  */
+/**
+ * #### 입출력 예
+ * |fees	|records|	result|
+ * |:---:|:---:|:---:|
+ * |[180, 5000, 10, 600]|	["05:34 5961 IN", "06:00 0000 IN", "06:34 0000 OUT", "07:59 5961 OUT", "07:59 0148 IN", "18:59 0000 IN", "19:09 0148 OUT", "22:59 5961 IN", "23:00 5961 OUT"]	|[14600, 34400, 5000]|
+ * |[120, 0, 60, 591]|	["16:00 3961 IN","16:00 0202 IN","18:00 3961 OUT","18:00 0202 OUT","23:58 3961 IN"]|	[0, 591]|
+ * |[1, 461, 1, 10]|	["00:00 1234 IN"]	|[14841]|
+ * @param {number[]} fees 주차요금제이다.
+ * @param {string[]} records 주차장에 입출찬한 내역이다.
+ * @returns
+ */
 function solution(fees, records) {
+  // records.forEach((record) => carNum.push(record.split(" ")[1]));
+  // const car = [...new Set(carNum)].sort();
+  // console.log(car);
+  // let counts = new Map();
+
+  const useInfo = [];
+  const map = new Map();
+  const carNum = new Set();
+  for (const record of records) {
+    const length = useInfo.push([...record.split(" ")]) - 1;
+    const [time, number, IO] = useInfo[length];
+
+    if (map.has(number)) map.set(number, [...map.get(number), [time, IO]]);
+    else map.set(number, [[time, IO]]);
+
+    //[...carNum.add(number)].sort;
+    carNum.add(number);
+  }
+
+  for (const [number, use] of map) {
+    for (let i = 0; i < use.length; i += 2) {
+      const [timeIn, I] = use[i];
+      const [timeOut, O] =
+        use[i + 1] != undefined ? use[i + 1] : ["23:59", "OUT"];
+      const [hourIn, minunteIn] = timeIn.split(":");
+      const [hourOut, minunteOut] = timeOut.split(":");
+      console.log(
+        number,
+        I,
+        `${hourIn}:${minunteIn}`,
+        O,
+        `${hourOut}:${minunteOut}`
+      );
+    }
+  }
+  console.log(carNum);
+
   var answer = [];
   return answer;
 }
+
+solution(
+  [180, 5000, 10, 600],
+  [
+    "05:34 5961 IN",
+    "06:00 0000 IN",
+    "06:34 0000 OUT",
+    "07:59 5961 OUT",
+    "07:59 0148 IN",
+    "18:59 0000 IN",
+    "19:09 0148 OUT",
+    "22:59 5961 IN",
+    "23:00 5961 OUT",
+  ]
+);
+
+/*
+solution(
+  [120, 0, 60, 591],
+  [
+    "16:00 3961 IN",
+    "16:00 0202 IN",
+    "18:00 3961 OUT",
+    "18:00 0202 OUT",
+    "23:58 3961 IN",
+  ]
+);
+*/
+// solution([1, 461, 1, 10], ["00:00 1234 IN"]);
+/*
+function solution(id_list, report, k) {
+    let reports = [...new Set(report)].map(a=>{return a.split(' ')});
+    let counts = new Map();
+    for (const bad of reports){
+        counts.set(bad[1],counts.get(bad[1])+1||1)
+    }
+    let good = new Map();
+    for(const report of reports){
+        if(counts.get(report[1])>=k){
+            good.set(report[0],good.get(report[0])+1||1)
+        }
+    }
+    let answer = id_list.map(a=>good.get(a)||0)
+    return answer;
+}
+*/
