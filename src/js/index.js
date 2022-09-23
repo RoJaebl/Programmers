@@ -84,7 +84,58 @@
  * 제한시간 안내
  * 정확성 테스트 : 10초
  */
+/**
+ * ### 입출력 예
+ *
+ * |id_list                             |	report                                                           |	k	 |result   |
+ * |:----------------------------------:|:----------------------------------------------------------------:|:---:|:-------:|
+ * |["muzi", "frodo", "apeach", "neo"]	|["muzi frodo","apeach frodo","frodo neo","muzi neo","apeach muzi"]|  2  |[2,1,1,0]|
+ * |["con", "ryan"]	                    |["ryan con", "ryan con", "ryan con", "ryan con"]	                 |  3  |[0,0]    |
+ *
+ * @param {string[]} id_list 이용자 ID 리스트
+ * @param {string[]} report 신고힌 이용자와 신고된 이용자가 담긴 ID 리스트
+ * @param {nubmer} k 경고 횟수
+ * @returns
+ */
 function solution(id_list, report, k) {
-  var answer = [];
+  const reportTable = {};
+  const reporterTable = {};
+  const answer = new Array(id_list.length).fill(0);
+
+  // 유저 아이디로 신고테이블 작성
+  id_list.forEach((value) => {
+    reportTable[value] = [];
+    reporterTable[value] = [];
+  });
+
+  // 신고가 접수된 ID가 있으면 신고테이블에 추가
+  report.forEach((value) => {
+    const [reporter, target] = value.split(" ");
+
+    // 신고테이블에 중복 신고했는지 검사
+    if (!reportTable[target].includes(reporter))
+      // 신고 내역이 없다면 신고테이블에 신고자 추가
+      reportTable[target] = [...reportTable[target], reporter];
+    // 신고한 이력이 없다면 신고자테이블에 추가
+    if (!reporterTable[reporter].includes(target))
+      reporterTable[reporter] = [...reporterTable[reporter], target];
+  });
+
+  // 신고테이블을 돌면서 k번 신고당한 사람을 신고한 사람에게 메일 발송
+  Object.keys(reportTable).forEach((imposter) => {
+    if (k <= reportTable[imposter].length) {
+      Object.keys(reporterTable).forEach((reporter, index) => {
+        if (reporterTable[reporter].includes(imposter)) answer[index] += 1;
+      });
+    }
+  });
   return answer;
 }
+/*
+solution(
+  ["muzi", "frodo", "apeach", "neo"],
+  ["muzi frodo", "apeach frodo", "frodo neo", "muzi neo", "apeach muzi"],
+  2
+);
+*/
+solution(["con", "ryan"], ["ryan con", "ryan con", "ryan con", "ryan con"], 3);
