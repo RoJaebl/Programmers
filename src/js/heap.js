@@ -203,7 +203,7 @@ export class ascendingObj extends Heap {
    * @return {T}
    */
   delete = () => {
-    if (this.size() < 2) return {};
+    if (this.size() == 1) return this.heap.pop();
 
     const [zero, first, ...heap] = this.heap;
     let last = heap.pop();
