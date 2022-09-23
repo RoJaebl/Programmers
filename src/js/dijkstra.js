@@ -223,6 +223,8 @@ export function dijkstraBase(n, paths, gate) {
  * @returns
  */
 export function dijkstraHeap(n, paths, gate) {
+  const RESOURCE = "resource"
+  const VISIT = "visit"
   const nodeObj = {
     to: undefined,
     resource: undefined,
@@ -233,47 +235,45 @@ export function dijkstraHeap(n, paths, gate) {
   };
   const nodeMap = new NodeMap(n, paths, nodeObj);
   const nodeTable = new NodeTable(n, tableObj);
-  const heapTable = new Heap.descendingObj("resuorce");
+  const heapTable = new Heap.descendingObj(RESOURCE);
 
   nodeMap.showMap();
+
+  const dijkstra = (startNode) => {
+    nodeTable.setValue(startNode, RESOURCE, 0); // start node에 대해 nodeTable 업데이트
+    heapTable.insert({ to: startNode, resource: 0 }); // 처음 탐색할 node 정보 입력
+
+    // 탐색할 노드가 없어질때까지 while문을 돌린다.
+    while (heapTable.size() != 0) {
+      const { to: current } = heapTable.delete(); // current(현재 방문한 노드)를 방문처리한다.
+      if (nodeTable.getValue(current, VISIT)) continue; // 꺼내 왔는데 이미 방문한 곳이면 재끼기
+      else nodeTable.setValue(current, VISIT, true); // 방문한 곳이 아니라면 방문처리 하고 코드진행
+
+      // current와 연결된 노드갯수 만큼 반복문을 돌린다.
+      nodeMap.getMap(current).forEach((node) => {
+        const { to, resource } = node;
+        // 방문하지 않은 node에 대해서만 조건실행
+        if (!nodeTable.getItem(to)[VISIT]) {
+          // 현재 노드와 현재 노드에서 검사할 노드 사이의 resource합이 검사할 노드의 resource보다 작으면
+          // 검사할 노드의 resource 업데이트(nodeTable을 업데이트)
+          if (
+            nodeTable.getItem(current)[RESOURCE] + resource <
+            nodeTable.getItem(to)[RESOURCE]
+          ) {
+            nodeTable.setValue(
+              to,
+              RESOURCE,
+              nodeTable.getItem(current)[RESOURCE] + resource
+            );
+          }
+          // 방문하지 않는 검사 노드의 주변 노드정보를 탐색 테이블에 저장한다.
+          heapTable.insert(node);
+        }
+      });
+    }
+  };
+  dijkstra(gate);
   nodeTable.showTable();
 
-  const dijkstra = (startNode) => {
-    heapTable.insert({ to: startNode, resource: 0 });
-    heapTable.showHeap();
-    // while (heapTable.size() > 0) {
-    //   const { to: current, resource } = heapTable.delete();
-    //   nodeMap.getMap(current).forEach((value) => heapTable.insert(value));
-    //   console.log(current, resource);
-    //   heapTable.showHeap();
-    // }
-    for (let i = 0; i < 6; i++) {
-      const { to: current, resource } = heapTable.delete();
-      nodeMap.getMap(current).forEach((value) => heapTable.insert(value));
-      console.log(current, resource);
-      heapTable.showHeap();
-    }
-  };
-
-  /*
-  const dijkstra = (startNode) => {
-    initialTable(startNode);
-    for (let i = 0; i < nodeMap.length - 2; i++) {
-      const current = getGrid(table);
-      table[current][VISIT] = true;
-      const currentNode = nodeMap.getMap(current);
-
-      for (let j = 0; j < currentNode.length; j++) {
-        const [node] = currentNode[j];
-        if (
-          !table[node][VISIT] &&
-          table[current][WEIGHT] + currentNode[j][WEIGHT] < table[node][WEIGHT]
-        )
-          table[node][WEIGHT] = table[current][WEIGHT] + currentNode[j][WEIGHT];
-      }
-    }
-  };
-  */
-  dijkstra(gate);
   return 0;
 }
